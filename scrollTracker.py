@@ -48,10 +48,10 @@ while True:
         
         if pts_r[0][1] > 300:
             #print("baixo")
-            pyautogui.scroll(-15)
-        elif pts_r[0][1] < 100:
+            pyautogui.scroll(-30)
+        elif pts_r[0][1] < 100 and pts_r[0][1] > 0:
             #print("alto")
-            pyautogui.scroll(15)
+            pyautogui.scroll(30)
         #else:
             #print("medio")
             
