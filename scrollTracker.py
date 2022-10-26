@@ -10,8 +10,8 @@ ret, frame = cap.read()
 low_red = np.array([0, 140, 172])
 high_red = np.array([9, 255, 255])
 
-low_green = np.array([44, 168, 45])
-high_green = np.array([140,255,158])
+low_green = np.array([40, 175, 45])
+high_green = np.array([121,255,255])
 
 low_yellow = np.array([16, 139, 16])
 high_yellow = np.array([36, 209, 255])
