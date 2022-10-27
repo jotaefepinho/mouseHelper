@@ -55,7 +55,7 @@ while True:
         img2 = cv2.polylines(frame, [pts_m], True, green, 2)
               
         
-        if pts_m[0][0] > 0 and pts_m[0][0] < 600 and pts_m[0][1] > 0 and pts_m[0][1] < 400 and time == 0:
+        if (1920 * pts_m[0][0] / x < 1920 and 1920 * pts_m[0][0] / x > 0) and (1080 * pts_m[0][1] / y < 1080 and 1080 * pts_m[0][1] / y > 0) and time == 0:
             pyautogui.moveTo(1920 * pts_m[0][0] / x, 1080 * pts_m[0][1] / y)
 
         coloredMask2 = cv2.bitwise_and(frame, frame, mask = mask_mouse)
@@ -78,13 +78,18 @@ while True:
         
         #choose rectangle color on next line
         img3 = cv2.polylines(frame, [pts_c], True, yellow, 2)
-        
-        if pts_c[0][1] > 300:
+
+        #scroll up and down        
+        if pts_c[0][1] > 280:
             pyautogui.scroll(-30)
-        elif pts_c[0][1] < 100 and pts_c[0][1] > 0:
+        elif pts_c[0][1] < 80 and pts_c[0][1] > 0:
             pyautogui.scroll(30)
  
-
+        #click and right click
+        if pts_c[1][1] > 300:
+            pyautogui.click()
+        elif pts_c[1][1] < 60 and pts_c[1][1] > 0:
+            pyautogui.click(button = 'right')
             
         coloredMask = cv2.bitwise_and(frame, frame, mask = mask_controls)
            
