@@ -19,10 +19,15 @@ high_yellow = np.array([36, 255, 255])
 low_pink = np.array([160, 141, 161])
 high_pink = np.array([179, 255, 255])
 
+low_blue = np.array([103, 115, 146])
+high_blue = np.array([117,255,255])
+
 red = (0, 0, 255)
 green = (0, 255, 0)
 yellow = (0, 255, 255)
 pink = (145, 80, 175)
+blue = (255, 100, 0)
+
 
 x, y, w, h = 600, 400, 100, 50 # simply hardcoded the values
 track_window = (x, y, w, h)
@@ -38,7 +43,7 @@ while True:
         
         #mouse Tracking
         #choose mouse control colors on next line
-        mask_mouse = cv2.inRange(hsv_frame, low_green, high_green)
+        mask_mouse = cv2.inRange(hsv_frame, low_pink, high_pink)
         roi_hist_mouse = cv2.calcHist([hsv_frame],[0], mask_mouse,[180],[0,180])
         cv2.normalize(roi_hist_mouse, roi_hist_mouse, 0, 255, cv2.NORM_MINMAX)
         
@@ -52,7 +57,7 @@ while True:
         
         
         #choose rectangle color on next line
-        img2 = cv2.polylines(frame, [pts_m], True, green, 2)
+        img2 = cv2.polylines(frame, [pts_m], True, pink, 2)
               
         
         if (1920 * pts_m[0][0] / x < 1920 and 1920 * pts_m[0][0] / x > 0) and (1080 * pts_m[0][1] / y < 1080 and 1080 * pts_m[0][1] / y > 0) and time == 0:
@@ -64,7 +69,7 @@ while True:
 
         #controls Tracking
         #choose scroll and click colors on next line
-        mask_controls = cv2.inRange(hsv_frame, low_yellow, high_yellow)
+        mask_controls = cv2.inRange(hsv_frame, low_blue, high_blue)
         roi_hist_controls = cv2.calcHist([hsv_frame],[0], mask_controls,[180],[0,180])
         cv2.normalize(roi_hist_controls, roi_hist_controls, 0, 255, cv2.NORM_MINMAX)
         
@@ -77,7 +82,7 @@ while True:
         pts_c = np.int0(pts_c)
         
         #choose rectangle color on next line
-        img3 = cv2.polylines(frame, [pts_c], True, yellow, 2)
+        img3 = cv2.polylines(frame, [pts_c], True, blue, 2)
 
         #scroll up and down        
         if pts_c[0][1] > 280:
@@ -87,8 +92,10 @@ while True:
  
         #click and right click
         if pts_c[1][1] > 300:
+            #print(pts_c[1][1])
             pyautogui.click()
         elif pts_c[1][1] < 60 and pts_c[1][1] > 0:
+            #print(pts_c[1][1])
             pyautogui.click(button = 'right')
             
         coloredMask = cv2.bitwise_and(frame, frame, mask = mask_controls)
