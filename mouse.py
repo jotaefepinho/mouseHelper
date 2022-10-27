@@ -14,10 +14,15 @@ low_green = np.array([40, 175, 45])
 high_green = np.array([121,255,255])
 
 low_yellow = np.array([16, 139, 16])
-high_yellow = np.array([36, 209, 255])
+high_yellow = np.array([36, 255, 255])
 
 low_pink = np.array([160, 141, 161])
 high_pink = np.array([179, 255, 255])
+
+red = (0, 0, 255)
+green = (0, 255, 0)
+yellow = (0, 255, 255)
+pink = (145, 80, 175)
 
 x, y, w, h = 600, 400, 100, 50 # simply hardcoded the values
 track_window = (x, y, w, h)
@@ -31,59 +36,61 @@ while True:
         
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
-        #green Tracking
-        mask_green = cv2.inRange(hsv_frame, low_green, high_green)
-        roi_hist_green = cv2.calcHist([hsv_frame],[0], mask_green,[180],[0,180])
-        cv2.normalize(roi_hist_green, roi_hist_green, 0, 255, cv2.NORM_MINMAX)
+        #mouse Tracking
+        #choose mouse control colors on next line
+        mask_mouse = cv2.inRange(hsv_frame, low_green, high_green)
+        roi_hist_mouse = cv2.calcHist([hsv_frame],[0], mask_mouse,[180],[0,180])
+        cv2.normalize(roi_hist_mouse, roi_hist_mouse, 0, 255, cv2.NORM_MINMAX)
         
-        hsv_green = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        dst_green = cv2.calcBackProject([hsv_green],[0],roi_hist_green,[0,180],1)
+        hsv_mouse = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        dst_mouse = cv2.calcBackProject([hsv_mouse],[0],roi_hist_mouse,[0,180],1)
         
-        ret, track_window = cv2.CamShift(dst_green, track_window, term_crit)
+        ret, track_window = cv2.CamShift(dst_mouse, track_window, term_crit)
         
-        pts_g = cv2.boxPoints(ret)
-        pts_g = np.int0(pts_g)
+        pts_m = cv2.boxPoints(ret)
+        pts_m = np.int0(pts_m)
         
-        img2 = cv2.polylines(frame, [pts_g], True, (0, 255, 0), 2)
+        
+        #choose rectangle color on next line
+        img2 = cv2.polylines(frame, [pts_m], True, green, 2)
               
         
-        if pts_g[0][0] > 0 and pts_g[0][0] < 600 and pts_g[0][1] > 0 and pts_g[0][1] < 400 and time == 0:
-            pyautogui.moveTo(1920 * pts_g[0][0] / x, 1080 * pts_g[0][1] / y)
+        if pts_m[0][0] > 0 and pts_m[0][0] < 600 and pts_m[0][1] > 0 and pts_m[0][1] < 400 and time == 0:
+            pyautogui.moveTo(1920 * pts_m[0][0] / x, 1080 * pts_m[0][1] / y)
 
-        
-        mask2 = cv2.inRange(hsv_frame, low_green, high_green)
-        
-        coloredMask2 = cv2.bitwise_and(frame, frame, mask = mask_green)
+        coloredMask2 = cv2.bitwise_and(frame, frame, mask = mask_mouse)
 
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        #pink Tracking
-        mask_red = cv2.inRange(hsv_frame, low_pink, high_pink)
-        roi_hist_red = cv2.calcHist([hsv_frame],[0], mask_red,[180],[0,180])
-        cv2.normalize(roi_hist_red, roi_hist_red, 0, 255, cv2.NORM_MINMAX)
+        #controls Tracking
+        #choose scroll and click colors on next line
+        mask_controls = cv2.inRange(hsv_frame, low_yellow, high_yellow)
+        roi_hist_controls = cv2.calcHist([hsv_frame],[0], mask_controls,[180],[0,180])
+        cv2.normalize(roi_hist_controls, roi_hist_controls, 0, 255, cv2.NORM_MINMAX)
         
-        hsv_red = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        dst_red = cv2.calcBackProject([hsv_red], [0],roi_hist_red,[0,180],1)
+        hsv_controls = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        dst_controls = cv2.calcBackProject([hsv_controls], [0],roi_hist_controls,[0,180],1)
         
-        ret, track_window = cv2.CamShift(dst_red, track_window, term_crit)
+        ret, track_window = cv2.CamShift(dst_controls, track_window, term_crit)
         
-        pts_r = cv2.boxPoints(ret)
-        pts_r = np.int0(pts_r)
+        pts_c = cv2.boxPoints(ret)
+        pts_c = np.int0(pts_c)
         
-        img3 = cv2.polylines(frame, [pts_r], True, (145, 80, 175), 2)
+        #choose rectangle color on next line
+        img3 = cv2.polylines(frame, [pts_c], True, yellow, 2)
         
-        if pts_r[0][1] > 300:
-            #print("baixo")
+        if pts_c[0][1] > 300:
             pyautogui.scroll(-30)
-        elif pts_r[0][1] < 100 and pts_r[0][1] > 0:
-            #print("alto")
+        elif pts_c[0][1] < 100 and pts_c[0][1] > 0:
             pyautogui.scroll(30)
-        #else:
-            #print("medio")
+ 
+
             
-        coloredMask = cv2.bitwise_and(frame, frame, mask = mask_red)
+        coloredMask = cv2.bitwise_and(frame, frame, mask = mask_controls)
            
         stacked = np.hstack((img3, coloredMask, coloredMask2))
+        
+        
         cv2.imshow("Tracking", cv2.resize(stacked, None, fx = 0.8, fy = 0.8))
 
         key = cv2.waitKey(30) & 0xff
