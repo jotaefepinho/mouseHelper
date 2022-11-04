@@ -19,8 +19,23 @@ high_yellow = np.array([36, 209, 255])
 low_pink = np.array([160, 141, 161])
 high_pink = np.array([179, 255, 255])
 
-x, y, w, h = 600, 400, 100, 50 # simply hardcoded the values
+red = (0, 0, 255)
+green = (0, 255, 0)
+yellow = (0, 255, 255)
+pink = (145, 80, 175)
+blue = (255, 100, 0)
+
+#widthcv, heightcv  = cap.get(3), cap.get(4)
+widthcv = 1280
+heightcv = 720
+width, height = pyautogui.size()
+
+x, y, w, h = widthcv, heightcv, 100, 50 # simply hardcoded the values
 track_window = (x, y, w, h)
+
+
+width = 2560
+height = 1600
 
 term_crit = ( cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1 )
 while True:
@@ -44,11 +59,14 @@ while True:
         pts_g = cv2.boxPoints(ret)
         pts_g = np.int0(pts_g)
         
-        img2 = cv2.polylines(frame, [pts_g], True, (0, 255, 0), 2)
-              
+        print(pts_g)
+        img2 = cv2.polylines(frame, [pts_g], True, green, 2)
+        #img3 = cv2.circle(frame, [pts_g], True, green, 2)
         
-        if pts_g[0][0] > 0 and pts_g[0][0] < 600 and pts_g[0][1] > 0 and pts_g[0][1] < 400 and time == 0:
-            pyautogui.moveTo(1920 * pts_g[0][0] / x, 1080 * pts_g[0][1] / y)
+        if pts_g[0][0] > 0 and pts_g[0][0] < widthcv and pts_g[0][1] > 0 and pts_g[0][1] < heightcv and time == 0:
+            #pyautogui.moveTo(width * pts_g[0][0] / x, height * pts_g[0][1] / y)
+            print(width * pts_g[0][0] / x, height * pts_g[0][1] / y)
+            #print(pts_g[0][0], pts_g[0][1])
 
         
         mask2 = cv2.inRange(hsv_frame, low_green, high_green)
