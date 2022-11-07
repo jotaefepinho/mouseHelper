@@ -7,8 +7,8 @@ def chooseColor(choice):
     low_red = np.array([0, 140, 172])
     high_red = np.array([9, 255, 255])
 
-    low_green = np.array([40, 130, 45])
-    high_green = np.array([60, 255,158])
+    low_green = np.array([60, 60, 143])
+    high_green = np.array([80, 255, 255])
 
     low_yellow = np.array([16, 139, 16])
     high_yellow = np.array([36, 255, 255])
@@ -55,13 +55,14 @@ print("Choose a color for controls:\n" + "red\n" + "green\n" + "blue\n" + "pink\
 choice = input()
 color_c, low_color_c, high_color_c = chooseColor(choice)
 
-#marcação do tempo para o acompanhamento do ponteiro: taxa de atualização
-#de meio segundo
+#marcação do tempo para o acompanhamento do ponteiro: 
+#taxa de atualização de meio segundo
 next_time = datetime.datetime.now()
 delta = datetime.timedelta(seconds = 0.5)
 
-x, y, w, h = 1280, 720, 100, 50
-track_window = (x, y, w, h)
+x, y, w, h = 640, 360, 100, 50
+track_window1 = (x, y, w, h)
+track_window2 = (x, y, w, h)
 
 #dimensões do monitor para o controle do ponteiro do mouse
 width = 1920
@@ -71,26 +72,34 @@ cap_width = np.size(frame, 1)
 cap_height = np.size(frame, 0)
 
 term_crit = ( cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1 )
+m_flag = 0
 while True:
     ret, frame = cap.read()
     period = datetime.datetime.now()
     if ret == True:
         
         frame = cv2.flip(frame, 1)
-        
-        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        
+                
         #mouse Tracking
-        mask_mouse = cv2.inRange(hsv_frame, low_color_m, high_color_m)
-        roi_hist_mouse = cv2.calcHist([hsv_frame],[0], mask_mouse,[180],[0,180])
+        hsv_mouse = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        
+        mask_mouse = cv2.inRange(hsv_mouse, low_color_m, high_color_m)
+        roi_hist_mouse = cv2.calcHist([hsv_mouse],[0], mask_mouse,[180],[0,180])
         cv2.normalize(roi_hist_mouse, roi_hist_mouse, 0, 255, cv2.NORM_MINMAX)
         
-        hsv_mouse = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+          
+        #control Tracking
+        hsv_controls = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+         
+        mask_controls = cv2.inRange(hsv_controls, low_color_c, high_color_c)
+        roi_hist_controls = cv2.calcHist([hsv_controls],[0], mask_controls,[180],[0,180])
+        cv2.normalize(roi_hist_controls, roi_hist_controls, 0, 255, cv2.NORM_MINMAX)
+         
         dst_mouse = cv2.calcBackProject([hsv_mouse],[0],roi_hist_mouse,[0,180],1)
         
-        ret, track_window = cv2.CamShift(dst_mouse, track_window, term_crit)
+        ret_m, track_window1 = cv2.CamShift(dst_mouse, track_window1, term_crit)
         
-        pts_m = cv2.boxPoints(ret)
+        pts_m = cv2.boxPoints(ret_m)
         pts_m = np.int0(pts_m)
         center_m = (int((pts_m[0][0] + pts_m[1][0] + pts_m[2][0] + pts_m[3][0])/4), int((pts_m[0][1] + pts_m[1][1] + pts_m[2][1] + pts_m[3][1])/4))
         
@@ -99,24 +108,16 @@ while True:
         
         
         if (width * center_m[0] / x < width and center_m[0] / x > 0) and (height * center_m[1] / y < height and height * center_m[1] / y > 0) and period >= next_time:
-            pyautogui.moveTo(width * pts_m[0][0] / x, height * pts_m[0][1] / y)
+            pyautogui.moveTo(width * center_m[0] / x, height * center_m[1] / y)
             next_time += delta
 
         coloredMask2 = cv2.bitwise_and(frame, frame, mask = mask_mouse)
 
-        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-        #control Tracking
-        mask_controls = cv2.inRange(hsv_frame, low_color_c, high_color_c)
-        roi_hist_controls = cv2.calcHist([hsv_frame],[0], mask_controls,[180],[0,180])
-        cv2.normalize(roi_hist_controls, roi_hist_controls, 0, 255, cv2.NORM_MINMAX)
-        
-        hsv_controls = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         dst_controls = cv2.calcBackProject([hsv_controls], [0],roi_hist_controls,[0,180],1)
         
-        ret, track_window = cv2.CamShift(dst_controls, track_window, term_crit)
+        ret_c, track_window2 = cv2.CamShift(dst_controls, track_window2, term_crit)
         
-        pts_c = cv2.boxPoints(ret)
+        pts_c = cv2.boxPoints(ret_c)
         pts_c = np.int0(pts_c)
         center_c = (int((pts_c[0][0] + pts_c[1][0] + pts_c[2][0] + pts_c[3][0])/4), int((pts_c[0][1] + pts_c[1][1] + pts_c[2][1] + pts_c[3][1])/4))
         
@@ -132,12 +133,16 @@ while True:
             pyautogui.scroll(30)
 
         #click and right click
-        if center_c[0] > (cap_width - cap_width * 0.2):
+        if center_c[0] > (cap_width - cap_width * 0.2) and m_flag == 0:
             #print("click")
             pyautogui.click()
-        elif center_c[0] < cap_width * 0.2 and center_c[0] > 0:
+            m_flag = 1
+        elif center_c[0] < cap_width * 0.2 and center_c[0] > 0 and m_flag == 0:
             #print("right click")
             pyautogui.click(button = 'right')
+            m_flag = 1
+        elif m_flag == 1 and center_c[0] > (cap_width * 0.2) and center_c[0] < (cap_width - cap_width * 0.2):
+            m_flag = 0
 
         coloredMask = cv2.bitwise_and(frame, frame, mask = mask_controls)
 
@@ -148,7 +153,8 @@ while True:
         img3 = cv2.line(img3, (int(cap_width - cap_width * 0.2), 0), (int(cap_width - cap_width * 0.2), height), color_c, 2)
     
         
-        font = cv3.FONT_HERSHEY_SIMPLEX
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        
         fontScale = 1
         thickness = 3
 
@@ -158,12 +164,16 @@ while True:
         img3 = cv2.putText(img3, 'RClick', (int(cap_width * 0.05), int(cap_height * 0.5)), font, fontScale, white, thickness, cv2.LINE_AA)
          
         stacked = np.hstack((img3, coloredMask, coloredMask2))
-        cv2.imshow("Tracking", cv2.resize(stacked, None, fx = 0.8, fy = 0.8))
+        cv2.imshow("Tracking", cv2.resize(stacked, None, fx = 0.6, fy = 0.6))
 
+        #cv2.imshow("mouseHelper", cv2.resize(img3, None, fx = 0.8, fy = 0.8))
         key = cv2.waitKey(30) & 0xff
-        
+    
+    else:
+        break
     if key == 27:
         break
+    
     
 cap.release()
 cv2.destroyAllWindows()
