@@ -14,7 +14,7 @@
 - [ ] Melhoria na codificação do tamanho da tela e do tracker (está hard-coded)
 
 ## Pré-requisitos
--Python3
--OpenCV para Python
--Webcam
--Objetos com cores claras e saturadas, dentro da palheta de cores
+- Python3
+- OpenCV para Python
+- Webcam
+- Objetos com cores claras e saturadas, dentro da palheta de cores
