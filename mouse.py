@@ -38,25 +38,34 @@ def chooseColor(choice):
     else:
         return 0
 
+#inicialização da captura da webcam
 cap = cv2.VideoCapture(0)
 ret, frame = cap.read()
+
+#definição da cor branca para o texto-guia
 white = (255, 255, 255)
 
+#Escolha da cor para o acompanhamento do ponteiro do mouse
 print("Choose a color for mouse tracking:\n" + "red\n" + "green\n" + "blue\n" + "pink\n" + "yellow\n")
 choice = input()
 color_m, low_color_m, high_color_m = chooseColor(choice)
 
+#Escolha da cor para os controles do mouse
 print("Choose a color for controls:\n" + "red\n" + "green\n" + "blue\n" + "pink\n" + "yellow\n")
 choice = input()
 color_c, low_color_c, high_color_c = chooseColor(choice)
 
+#marcação do tempo para o acompanhamento do ponteiro: taxa de atualização
+#de meio segundo
 next_time = datetime.datetime.now()
 delta = datetime.timedelta(seconds = 0.5)
 
-x, y, w, h = 1280, 720, 100, 50 # simply hardcoded the values
+x, y, w, h = 1280, 720, 100, 50
 track_window = (x, y, w, h)
-width = 1440
-height = 900
+
+#dimensões do monitor para o controle do ponteiro do mouse
+width = 1920
+height = 1080
 
 cap_width = np.size(frame, 1)
 cap_height = np.size(frame, 0)
@@ -116,32 +125,32 @@ while True:
 
         #scroll up and down        
         if center_c[1] > (cap_height - cap_height * 0.3) and center_c[0] < cap_width - cap_width * 0.2 and center_c[0] > cap_width * 0.2:
-            print("scroll down")
-            #pyautogui.scroll(-30)
+            #print("scroll down")
+            pyautogui.scroll(-30)
         elif center_c[1] < (cap_height * 0.3) and center_c[0] < cap_width - cap_width * 0.2 and center_c[0] > cap_width * 0.2:
-            print("scroll up")
-            #pyautogui.scroll(30)
+            #print("scroll up")
+            pyautogui.scroll(30)
 
         #click and right click
         if center_c[0] > (cap_width - cap_width * 0.2):
-            print("click")
-            #pyautogui.click()
+            #print("click")
+            pyautogui.click()
         elif center_c[0] < cap_width * 0.2 and center_c[0] > 0:
-            print("right click")
-            #pyautogui.click(button = 'right')
+            #print("right click")
+            pyautogui.click(button = 'right')
 
         coloredMask = cv2.bitwise_and(frame, frame, mask = mask_controls)
 
-        img3 = cv2.line(img3, (0, int(cap_height * 0.3)), (cap_width, int(cap_height * 0.3)), color_c, 2)
-        img3 = cv2.line(img3, (0, int(cap_height - cap_height * 0.3)), (cap_width, int(cap_height - cap_height * 0.3)), color_c, 2)
+        img3 = cv2.line(img3, (int(cap_width * 0.2), int(cap_height * 0.3)), (int(cap_width - cap_width * 0.2), int(cap_height * 0.3)), color_c, 2)
+        img3 = cv2.line(img3, (int(cap_width * 0.2), int(cap_height - cap_height * 0.3)), (int(cap_width - cap_width * 0.2), int(cap_height - cap_height * 0.3)), color_c, 2)
 
         img3 = cv2.line(img3, (int(cap_width * 0.2), 0), (int(cap_width * 0.2), cap_height), color_c, 2)
         img3 = cv2.line(img3, (int(cap_width - cap_width * 0.2), 0), (int(cap_width - cap_width * 0.2), height), color_c, 2)
     
         
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        fontScale = 2
-        thickness = 5
+        font = cv3.FONT_HERSHEY_SIMPLEX
+        fontScale = 1
+        thickness = 3
 
         img3 = cv2.putText(img3, 'Scroll Up', (int(cap_width * 0.3), int(cap_height * 0.15)), font, fontScale, white, thickness, cv2.LINE_AA)
         img3 = cv2.putText(img3, 'Scroll Down', (int(cap_width * 0.3), int(cap_height * 0.85)), font, fontScale, white, thickness, cv2.LINE_AA)
