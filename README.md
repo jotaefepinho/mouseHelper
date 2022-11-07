@@ -7,6 +7,7 @@
 ## Pré-requisitos
 - Python3
 - OpenCV para Python
+- Pyautogui
 - Webcam
 - Objetos com cores claras e saturadas, dentro da palheta de cores
 
