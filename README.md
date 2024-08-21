@@ -26,5 +26,7 @@ O ponteiro do mouse será posicionado na tela proporcionalmente no mesmo local q
 - [X] Melhoria no tempo de resposta
 - [X] Resolução do conflito entre objetos de diferentes cores
 - [X] Palheta básica de cores (Vermelho, Azul, Verde, Amarelo e Rosa)
+
+### Melhorias Futuras
 - [ ] Rastreamento de objetos específicos, sem a necessidade de cores saturadas
 - [ ] Melhoria na codificação do tamanho da tela e do tracker (está hard-coded)
